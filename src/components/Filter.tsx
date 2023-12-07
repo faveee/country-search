@@ -1,5 +1,4 @@
-import "./styles.css"
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
@@ -12,47 +11,21 @@ const Filter = ({
 }: {
   searchInput: string;
   setSearchInput: (value: string) => void;
-  setFiltered: (value: any) => void; 
+  setFiltered: (value: any) => void;
   setCountries: (value: any) => void;
   countries: any[];
 }) => {
-  const regions = [
-    {
-      name: "Filter by region",
-      desc: "All",
-    },
-    {
-      name: "Africa",
-      desc: "Africa",
-    },
-    {
-      name: "Americas",
-      desc: "Americas",
-    },
-    {
-      name: "Asia",
-      desc: "Asia",
-    },
-    {
-      name: "Europe",
-      desc: "Europe",
-    },
-    {
-      name: "Oceania",
-      desc: "Oceania",
-    },
-  ];
+  const [localSearchInput, setLocalSearchInput] = useState<string>("");
+  const regions = ["All", "Africa", "Americas", "Asia", "Europe", "Oceania"];
 
-  // Prevent page reload when submitting the form
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
   };
 
-  // Search countries
-  const searchCountries = (searchValue: any) => {
-    setSearchInput(searchValue);
+  const searchCountries = (searchValue: string) => {
+    setLocalSearchInput(searchValue);
 
-    if (searchInput) {
+    if (searchValue) {
       const filteredCountries = countries.filter((country: any) =>
         Object.values(country)
           .join("")
@@ -65,13 +38,11 @@ const Filter = ({
     }
   };
 
-  // Filter by region
-
-  const filterRegions = async (region: any = "All") => {
-    const url = "https://restcountries.com/v3.1/region/{region}";
+  const filterRegions = async (region: string = "All") => {
+    const url = `https://restcountries.com/v3.1/region/${region.toLowerCase()}`;
 
     try {
-      const res = await fetch(`${url}/${region}`);
+      const res = await fetch(url);
       const data = await res.json();
       setCountries(data);
     } catch (error) {
@@ -81,15 +52,14 @@ const Filter = ({
 
   useEffect(() => {
     filterRegions();
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
 
   return (
     <>
       <form className="input-group" id="form" onSubmit={handleSubmit}>
         <div className="search-group">
-          <FontAwesomeIcon  className="icon" icon={faSearch} />
+          <FontAwesomeIcon className="icon" icon={faSearch} />
           <input
             type="search"
             name="search"
@@ -106,14 +76,13 @@ const Filter = ({
             id="select"
             className="select"
             onChange={(e) => filterRegions(e.target.value)}
-            value={searchInput}
+            value={localSearchInput}
           >
-            <option value="Africa">Filter by Region</option>
-            <option value="Africa">Africa</option>
-            <option value="Asia">Asia</option>
-            <option value="Europe">Europe</option>
-            <option value="Americas">Americas</option>
-            <option value="Oceania">Oceania</option>
+            {regions.map((region) => (
+              <option key={region} value={region}>
+                {region === "All" ? "Filter by Region" : region}
+              </option>
+            ))}
           </select>
         </div>
       </form>

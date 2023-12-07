@@ -84,7 +84,7 @@ console.log("Type of countries:", typeof countries);
               country;
 
             return (
-              <Link to={`/countries/${name}`} key={numericCode}>
+              <Link to={`/country/${name}`} key={numericCode}>
                 <article>
                   <div className="section">
                     <img src={flag} alt={name} />
